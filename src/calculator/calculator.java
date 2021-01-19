@@ -1,22 +1,24 @@
 package calculator;
 
 import java.awt.EventQueue;
-import java.awt.event.*;
 import java.awt.*;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-import java.awt.Panel;
 import javax.swing.JToggleButton;
 import java.awt.Font;
 import java.awt.Insets;
 import javax.swing.JPanel;
-import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import java.awt.GridLayout;
 import java.awt.SystemColor;
 import java.awt.event.ActionListener;
+import java.awt.font.TextAttribute;
 import java.awt.event.ActionEvent;
-import javax.swing.SwingConstants;
+import javax.swing.SwingConstants;import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.border.CompoundBorder;
+import java.text.AttributedString;
 
 public class calculator implements ActionListener {
 
@@ -26,7 +28,7 @@ public class calculator implements ActionListener {
 	String inText[]=new String[50];
 	int inTop=-1;
 	JButton btn[]=new JButton[10];
-	boolean toggledOnce=false,pointTriggred=false,numberEnded=true;
+	boolean toggledOnce=true,pointTriggred=false,numberEnded=true,operatorEnabled=true,shiftEnabled=false,enabled10E=false,powerEnabled=false;
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -46,37 +48,68 @@ public class calculator implements ActionListener {
 
 	private void initialize() {
 		frmComcalculator = new JFrame();
+		frmComcalculator.setResizable(false);
+		frmComcalculator.getContentPane().setBackground(new Color(145, 76, 15));
 		frmComcalculator.setTitle("ComCalculator");
 		frmComcalculator.setBounds(100, 100, 300, 450);
 		frmComcalculator.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmComcalculator.getContentPane().setLayout(null);
 		
-		Panel panel = new Panel();
-		panel.setBounds(10, 23, 266, 60);
+		JPanel panel = new JPanel();
+		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel.setBackground(new Color(255, 204, 51));
+		panel.setBounds(10, 29, 266, 63);
 		frmComcalculator.getContentPane().add(panel);
 		panel.setLayout(null);
 		
 		textField = new JTextField();
+		textField.setBorder(UIManager.getBorder("ToolTip.border"));
+		textField.setEditable(false);
+		textField.setFont(new Font("Digital-7", Font.PLAIN, 28));
 		textField.setHorizontalAlignment(SwingConstants.TRAILING);
 		textField.setBackground(SystemColor.text);
-		textField.setEditable(false);
 		textField.setDisabledTextColor(SystemColor.text);
 		textField.setBounds(10, 12, 202, 43);
 		panel.add(textField);
 		textField.setColumns(10);
 		
 		JToggleButton statusButton = new JToggleButton("OFF");
+		statusButton.setBackground(new Color(0, 153, 0));
 		statusButton.setMargin(new Insets(2, 5, 2, 5));
 		statusButton.setFont(new Font("Tempus Sans ITC", Font.PLAIN, 8));
-		statusButton.setBounds(222, 20, 36, 28);
+		statusButton.setBounds(222, 35, 36, 20);
 		panel.add(statusButton);
 		
+		JButton operationBtn_8_1 = new JButton("AC");
+		operationBtn_8_1.setBackground(new Color(0, 153, 0));
+		operationBtn_8_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				toggledOnce=true;
+				operatorEnabled=true;
+				powerEnabled=false;
+				enabled10E=false;
+				textField.setText("");
+				inText=new String[50];
+				inText[0]="\0";
+				inTop=-1;
+				numberEnded=true;
+				ans=0.0;
+				
+			}
+		});
+		operationBtn_8_1.setMargin(new Insets(2, 4, 2, 4));
+		operationBtn_8_1.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
+		operationBtn_8_1.setBounds(222, 10, 36, 22);
+		panel.add(operationBtn_8_1);
+		
 		JPanel bottomPanel = new JPanel();
-		bottomPanel.setBounds(20, 89, 241, 300);
+		bottomPanel.setBackground(new Color(37, 230, 204));
+		bottomPanel.setBounds(20, 98, 241, 300);
 		frmComcalculator.getContentPane().add(bottomPanel);
 		bottomPanel.setLayout(null);
 		
 		JPanel numberPanel = new JPanel();
+		numberPanel.setBackground(new Color(255, 204, 102));
 		numberPanel.setBounds(10, 96, 143, 194);
 		bottomPanel.add(numberPanel);
 		numberPanel.setLayout(new GridLayout(4, 3, 1, 1));
@@ -87,6 +120,7 @@ public class calculator implements ActionListener {
 			btn[i].setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 			btn[i].addActionListener((ActionListener) this);
 			btn[i].setMargin(new Insets(2, 4, 2, 4));
+			btn[i].setBackground(new Color(137, 214, 28));
 		}
 		numberPanel.add(btn[7]);
 		numberPanel.add(btn[8]);
@@ -101,10 +135,13 @@ public class calculator implements ActionListener {
 		
 		
 		JButton btnNewButton_12 = new JButton("x10^");
+		btnNewButton_12.setBackground(new Color(105, 209, 67));
 		btnNewButton_12.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				textField.setText(textField.getText()+"E");
-				inText[++inTop]="E";
+				textField.setText(textField.getText()+"x10");
+				powerEnabled=true;
+				enabled10E=true;
+				operatorEnabled=true ;
 				numberEnded=true;
 			}
 		});
@@ -113,6 +150,7 @@ public class calculator implements ActionListener {
 		numberPanel.add(btnNewButton_12);
 		
 		JButton btnNewButton_11 = new JButton(".");
+		btnNewButton_11.setBackground(new Color(105, 209, 67));
 		btnNewButton_11.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				textField.setText(textField.getText()+".");
@@ -125,16 +163,21 @@ public class calculator implements ActionListener {
 		numberPanel.add(btnNewButton_11);
 		
 		JPanel normalOperation = new JPanel();
+		normalOperation.setBorder(new CompoundBorder());
+		normalOperation.setBackground(new Color(0, 153, 153));
 		normalOperation.setBounds(163, 97, 68, 162);
 		bottomPanel.add(normalOperation);
 		normalOperation.setLayout(new GridLayout(5, 2, 0, 0));
 		
 		JButton operationBtn_0 = new JButton("x");
+		operationBtn_0.setBackground(new Color(204, 204, 255));
 		operationBtn_0.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				toggledOnce=false;
 				textField.setText(textField.getText()+"x");
 				inText[++inTop]="x";
 				numberEnded=true;
+				powerEnabled=false;
 			}
 		});
 		normalOperation.add(operationBtn_0);
@@ -142,11 +185,14 @@ public class calculator implements ActionListener {
 		operationBtn_0.setFont(new Font("Trebuchet MS", Font.PLAIN, 15));
 		
 		JButton operationBtn_1 = new JButton("/");
+		operationBtn_1.setBackground(new Color(204, 204, 255));
 		operationBtn_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				toggledOnce=false;
 				textField.setText(textField.getText()+"/");
 				inText[++inTop]="/";
 				numberEnded=true;
+				powerEnabled=false;
 			}
 		});
 		operationBtn_1.setMargin(new Insets(2, 4, 2, 4));
@@ -154,11 +200,17 @@ public class calculator implements ActionListener {
 		normalOperation.add(operationBtn_1);
 		
 		JButton operationBtn_2 = new JButton("+");
+		operationBtn_2.setBackground(new Color(204, 204, 255));
 		operationBtn_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(inText[inTop].equals("("))
+					operatorEnabled=true;
+				toggledOnce=false;
 				textField.setText(textField.getText()+"+");
 				inText[++inTop]="+";
 				numberEnded=true;
+				powerEnabled=false;
+				
 					//System.out.printf("%d: %s",inTop,inText[inTop]);
 			}
 		});
@@ -167,11 +219,17 @@ public class calculator implements ActionListener {
 		normalOperation.add(operationBtn_2);
 		
 		JButton operationBtn_3 = new JButton("-");
+		operationBtn_3.setBackground(new Color(204, 204, 255));
 		operationBtn_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(inTop!=-1 && (inText[inTop].equals("(") || enabled10E ))
+					operatorEnabled=true;
+				toggledOnce=false;
 				textField.setText(textField.getText()+"-");
 				inText[++inTop]="-";
 				numberEnded=true;
+				powerEnabled=false;
+				
 			}
 		});
 		operationBtn_3.setMargin(new Insets(2, 4, 2, 4));
@@ -179,11 +237,14 @@ public class calculator implements ActionListener {
 		normalOperation.add(operationBtn_3);
 		
 		JButton operationBtn_4 = new JButton("(");
+		operationBtn_4.setBackground(new Color(204, 204, 255));
 		operationBtn_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				toggledOnce=false;
 				textField.setText(textField.getText()+"(");
 				inText[++inTop]="(";
 				numberEnded=true;
+				powerEnabled=false;
 			}
 		});
 		operationBtn_4.setMargin(new Insets(2, 2, 2, 2));
@@ -191,11 +252,14 @@ public class calculator implements ActionListener {
 		normalOperation.add(operationBtn_4);
 		
 		JButton operationBtn_5 = new JButton(")");
+		operationBtn_5.setBackground(new Color(204, 204, 255));
 		operationBtn_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				toggledOnce=false;
 				textField.setText(textField.getText()+")");
 				inText[++inTop]=")";
 				numberEnded=true;
+				powerEnabled=false;
 			}
 		});
 		operationBtn_5.setMargin(new Insets(2, 4, 2, 4));
@@ -203,11 +267,14 @@ public class calculator implements ActionListener {
 		normalOperation.add(operationBtn_5);
 		
 		JButton operationBtn_6 = new JButton("Mod");
+		operationBtn_6.setBackground(new Color(204, 204, 255));
 		operationBtn_6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				toggledOnce=false;
 				textField.setText(textField.getText()+"M");
 				inText[++inTop]="M";
 				numberEnded=true;
+				powerEnabled=false;
 			}
 		});
 		operationBtn_6.setMargin(new Insets(2, 2, 2, 2));
@@ -215,11 +282,14 @@ public class calculator implements ActionListener {
 		normalOperation.add(operationBtn_6);
 		
 		JButton operationBtn_7 = new JButton("^");
+		operationBtn_7.setBackground(new Color(204, 204, 255));
 		operationBtn_7.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				toggledOnce=false;
 				textField.setText(textField.getText()+"^");
 				inText[++inTop]="^";
 				numberEnded=true;
+				powerEnabled=false;
 			}
 		});
 		operationBtn_7.setMargin(new Insets(2, 4, 2, 4));
@@ -227,15 +297,18 @@ public class calculator implements ActionListener {
 		normalOperation.add(operationBtn_7);
 		
 		JButton operationBtn_8 = new JButton("C");
+		operationBtn_8.setBackground(new Color(255, 153, 153));
 		operationBtn_8.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				toggledOnce=true;
+				operatorEnabled=true;
+				powerEnabled=false;
+				enabled10E=false;
 				textField.setText("");
 				inText=new String[50];
 				inText[0]="\0";
 				inTop=-1;
 				numberEnded=true;
-				ans=0.0;
-				
 			}
 		});
 		operationBtn_8.setMargin(new Insets(2, 4, 2, 4));
@@ -243,17 +316,20 @@ public class calculator implements ActionListener {
 		normalOperation.add(operationBtn_8);
 		
 		JButton operationBtn_9 = new JButton("Ans");
+		operationBtn_9.setBackground(new Color(255, 153, 153));
 		operationBtn_9.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				operatorEnabled=false;
 				if(toggledOnce)
 				{
 					textField.setText("Ans");
-					toggledOnce=!toggledOnce;
+					toggledOnce=false;
 				}
 				else
 					textField.setText(textField.getText()+"Ans");
-				inText[++inTop]="A";
+				inText[++inTop]=" "+ans;
 				numberEnded=true;
+			//	System.out.printf(" %d: %s ",inTop,inText[inTop]);
 			}
 		});
 		operationBtn_9.setMargin(new Insets(2, 2, 2, 2));
@@ -261,14 +337,16 @@ public class calculator implements ActionListener {
 		normalOperation.add(operationBtn_9);
 		
 		JButton btnNewButton = new JButton("=");
+		btnNewButton.setBackground(new Color(255, 153, 0));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				toggledOnce=true;
 				inText[++inTop]="\0";
 				if(inputChecking(inText))
 				{
 					ans=solve(toPrefix());					
 					textField.setText(""+ans);	
-					toggledOnce=!toggledOnce;
+					toggledOnce=false;
 				}
 				else
 					textField.setText("Syntax Error");
@@ -283,9 +361,131 @@ public class calculator implements ActionListener {
 		bottomPanel.add(btnNewButton);	
 		
 		JPanel panel_1 = new JPanel();
-		panel_1.setBackground(new Color(250, 240, 230));
-		panel_1.setBounds(10, 10, 221, 76);
+		panel_1.setBorder(UIManager.getBorder("PopupMenu.border"));
+		panel_1.setBackground(new Color(200, 207, 19));
+		panel_1.setBounds(10, 10, 221, 82);
 		bottomPanel.add(panel_1);
+		panel_1.setLayout(new GridLayout(2, 6, 2, 2));
+		
+		JButton inBuiltOperation = new JButton("ln");
+		inBuiltOperation.setAlignmentX(0.5f);
+		inBuiltOperation.setBackground(new Color(227, 124, 54));
+		inBuiltOperation.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation);
+		
+		JButton btnE = new JButton("e^");
+		btnE.setAlignmentX(0.5f);
+		btnE.setBackground(new Color(227, 124, 54));
+		btnE.setMargin(new Insets(4, 4, 4, 4));
+		btnE.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(btnE);
+		
+		JButton btnTan = new JButton("sin");
+		btnTan.setAlignmentX(0.5f);
+		btnTan.setBackground(new Color(227, 124, 54));
+		btnTan.setMargin(new Insets(4, 4, 4, 4));
+		btnTan.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(btnTan);
+		
+		JButton inBuiltOperation_2 = new JButton("cos");
+		inBuiltOperation_2.setAlignmentX(0.5f);
+		inBuiltOperation_2.setBackground(new Color(227, 124, 54));
+		inBuiltOperation_2.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation_2.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation_2);
+		
+		JButton inBuiltOperation_4 = new JButton("tan");
+		inBuiltOperation_4.setAlignmentX(0.5f);
+		inBuiltOperation_4.setBackground(new Color(227, 124, 54));
+		inBuiltOperation_4.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation_4.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation_4);
+		
+		JButton inBuiltOperation_5 = new JButton("");
+		inBuiltOperation_5.setAlignmentX(0.5f);
+		inBuiltOperation_5.setBackground(new Color(227, 124, 54));
+		inBuiltOperation_5.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation_5.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation_5);
+		
+		JButton inBuiltOperation_6 = new JButton("");
+		inBuiltOperation_6.setAlignmentX(0.5f);
+		inBuiltOperation_6.setBackground(new Color(227, 124, 54));
+		inBuiltOperation_6.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation_6.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation_6);
+		
+		JButton inBuiltOperation_7 = new JButton("");
+		inBuiltOperation_7.setAlignmentX(0.5f);
+		inBuiltOperation_7.setBackground(new Color(227, 124, 54));
+		inBuiltOperation_7.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation_7.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation_7);
+		
+		JButton inBuiltOperation_3 = new JButton("");
+		inBuiltOperation_3.setAlignmentX(0.5f);
+		inBuiltOperation_3.setBackground(new Color(227, 124, 54));
+		inBuiltOperation_3.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation_3.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation_3);
+		
+		JButton inBuiltOperation_12 = new JButton("");
+		inBuiltOperation_12.setAlignmentX(0.5f);
+		inBuiltOperation_12.setBackground(new Color(227, 124, 54));
+		inBuiltOperation_12.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation_12.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation_12);
+		
+		JButton inBuiltOperation_13 = new JButton("");
+		inBuiltOperation_13.setAlignmentX(0.5f);
+		inBuiltOperation_13.setBackground(new Color(227, 124, 54));
+		inBuiltOperation_13.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation_13.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation_13);
+		
+		JButton inBuiltOperation_11 = new JButton("");
+		inBuiltOperation_11.setAlignmentX(0.5f);
+		inBuiltOperation_11.setBackground(new Color(227, 124, 54));
+		inBuiltOperation_11.setMargin(new Insets(4, 4, 4, 4));
+		inBuiltOperation_11.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		panel_1.add(inBuiltOperation_11);
+		
+		JButton btnNewButton_1 = new JButton("~Graph");
+		btnNewButton_1.setIcon(null);
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				graphPlotter graphPlot = new graphPlotter();
+				graphPlot.setTitle("Graph Plotter");
+				graphPlot.setVisible(true);
+			}
+		});
+		btnNewButton_1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnNewButton_1.setBackground(new Color(255, 248, 220));
+		btnNewButton_1.setForeground(new Color(0, 0, 0));
+		btnNewButton_1.setBounds(201, 3, 75, 23);
+		frmComcalculator.getContentPane().add(btnNewButton_1);
+		btnNewButton_1.setMargin(new Insets(2, 4, 2, 4));
+		btnNewButton_1.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
+		
+		JButton operationBtn_8_1_1 = new JButton("SHIFT");
+		operationBtn_8_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				shiftEnabled=!shiftEnabled;
+			}
+		});
+		operationBtn_8_1_1.setBounds(new Rectangle(2, 2, 2, 2));
+		operationBtn_8_1_1.setBorder(UIManager.getBorder("CheckBox.border"));
+		operationBtn_8_1_1.setMargin(new Insets(2, 4, 2, 4));
+		operationBtn_8_1_1.setFont(new Font("Segoe UI Historic", Font.PLAIN, 10));
+		operationBtn_8_1_1.setBounds(10, 5, 47, 22);
+		frmComcalculator.getContentPane().add(operationBtn_8_1_1);
+		
+		JPanel panel_2 = new JPanel();
+		panel_2.setBackground(new Color(153, 255, 102));
+		panel_2.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
+		panel_2.setBounds(10, 94, 266, 309);
+		frmComcalculator.getContentPane().add(panel_2);
 	}
 	public void actionPerformed(ActionEvent e)
 	{
@@ -294,7 +494,10 @@ public class calculator implements ActionListener {
 		{	
 		if(e.getSource()==btn[i])
 			{
-				textField.setText(textField.getText()+i);
+			if(!powerEnabled)
+			textField.setText(textField.getText()+i);
+			else
+			textField.setText(textField.getText()+ "^"+i);
 				if(pointTriggred)
 					inText[inTop]=inText[inTop]+i;
 				else
@@ -302,12 +505,32 @@ public class calculator implements ActionListener {
 					 if(!numberEnded)
 						 inText[inTop]=inText[inTop]+i;
 					 else
-					inText[++inTop]=""+i;
+					 {
+						 if(enabled10E)
+						 {	
+							 if(operatorEnabled && inTop>0)
+								 inText[inTop-1]=" "+(Double.parseDouble(inText[(inTop--)-1])*Math.pow(10, -i)); 
+							 else
+								 inText[inTop]=" "+(Double.parseDouble(inText[inTop])*Math.pow(10, i));
+						 }
+						 else
+						 {
+							 if(operatorEnabled && inTop!=-1)
+								 inText[inTop]=inText[inTop]+i;
+							 else
+								 inText[++inTop]=""+i;
+						 }
+					 }
+				
 				}
 				numberEnded=false;
+				operatorEnabled=false;
+				enabled10E=false;
+				pointTriggred=false;
 			}
 		}
 		//System.out.printf(" %d: %s ",inTop,inText[inTop]);
+		//System.out.printf(" state of 10POW %b ",enabled10E);
 	}
 	public String[] toPrefix()
 	{
@@ -348,8 +571,9 @@ public class calculator implements ActionListener {
 			outText[outI++]=stack[top--];
         }
 		outText[outI++]="\0";
-		for(int l=0;l<outI;l++)
-			System.out.printf("\n %s",outText[l]);
+	//	for(int l=0;l<outI;l++)
+		//	System.out.printf("\n %s",outText[l]);
+			
 		return outText;
 	}
 	public int priority(String inText2)
@@ -358,8 +582,7 @@ public class calculator implements ActionListener {
 	    {
 	    case "+":
 	    case "-":
-	    case "M":
-	    case "E": return 1;
+	    case "M": return 1;
 	    case "x":
 	    case "/": return 2;
 	    case "^": return 3;
@@ -369,6 +592,8 @@ public class calculator implements ActionListener {
 	public boolean inputChecking(String[] inText2)
 	{
 		int operators=0,operand=0,brackets=0;
+		//for(int l=0;inText2[l]!="\0";l++)
+		//	System.out.printf("  %s",inText2[l]);
 	    for(int i=0;inText2[i]!="\0";i++)
 	    {
 	       switch(inText2[i])
@@ -419,7 +644,6 @@ public class calculator implements ActionListener {
 		        if(checkIFOperand(strings[i]))
 		        {
 		        	outPut[++top]=Double.parseDouble(strings[i]);
-		        	
 		        }
 		        else
 		        {
