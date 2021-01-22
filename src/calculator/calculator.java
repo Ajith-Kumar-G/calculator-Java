@@ -19,6 +19,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.CompoundBorder;
 import java.text.AttributedString;
+import javax.swing.JLayeredPane;
 
 public class calculator implements ActionListener {
 
@@ -29,6 +30,7 @@ public class calculator implements ActionListener {
 	int inTop=-1;
 	JButton btn[]=new JButton[10];
 	boolean toggledOnce=true,pointTriggred=false,numberEnded=true,operatorEnabled=true,shiftEnabled=false,enabled10E=false,powerEnabled=false;
+	private JTextField textField_1;
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -62,6 +64,17 @@ public class calculator implements ActionListener {
 		frmComcalculator.getContentPane().add(panel);
 		panel.setLayout(null);
 		
+		textField_1 = new JTextField();
+		textField_1.setMargin(new Insets(0, 0, 0, 0));
+		textField_1.setBorder(null);
+		textField_1.setBounds(12, 15, 196, 10);
+		panel.add(textField_1);
+		textField_1.setHorizontalAlignment(SwingConstants.TRAILING);
+		textField_1.setBackground(SystemColor.text);
+		textField_1.setFont(new Font("Digital-7", Font.PLAIN, 11));
+		textField_1.setEditable(false);
+		textField_1.setColumns(10);
+		
 		textField = new JTextField();
 		textField.setBorder(UIManager.getBorder("ToolTip.border"));
 		textField.setEditable(false);
@@ -69,7 +82,7 @@ public class calculator implements ActionListener {
 		textField.setHorizontalAlignment(SwingConstants.TRAILING);
 		textField.setBackground(SystemColor.text);
 		textField.setDisabledTextColor(SystemColor.text);
-		textField.setBounds(10, 12, 202, 43);
+		textField.setBounds(10, 12, 202, 44);
 		panel.add(textField);
 		textField.setColumns(10);
 		
@@ -139,6 +152,7 @@ public class calculator implements ActionListener {
 		btnNewButton_12.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				textField.setText(textField.getText()+"x10");
+				textField_1.setText(textField_1.getText()+" ");
 				powerEnabled=true;
 				enabled10E=true;
 				operatorEnabled=true ;
@@ -154,6 +168,7 @@ public class calculator implements ActionListener {
 		btnNewButton_11.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				textField.setText(textField.getText()+".");
+				textField_1.setText(textField_1.getText()+" ");
 				pointTriggred=true;
 				inText[inTop]=inText[inTop]+".";
 			}
@@ -175,6 +190,7 @@ public class calculator implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				toggledOnce=false;
 				textField.setText(textField.getText()+"x");
+				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]="x";
 				numberEnded=true;
 				powerEnabled=false;
@@ -190,6 +206,7 @@ public class calculator implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				toggledOnce=false;
 				textField.setText(textField.getText()+"/");
+				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]="/";
 				numberEnded=true;
 				powerEnabled=false;
@@ -207,6 +224,7 @@ public class calculator implements ActionListener {
 					operatorEnabled=true;
 				toggledOnce=false;
 				textField.setText(textField.getText()+"+");
+				textField_1.setText(textField_1.getText()+"   ");
 				inText[++inTop]="+";
 				numberEnded=true;
 				powerEnabled=false;
@@ -226,6 +244,7 @@ public class calculator implements ActionListener {
 					operatorEnabled=true;
 				toggledOnce=false;
 				textField.setText(textField.getText()+"-");
+				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]="-";
 				numberEnded=true;
 				powerEnabled=false;
@@ -242,6 +261,7 @@ public class calculator implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				toggledOnce=false;
 				textField.setText(textField.getText()+"(");
+				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]="(";
 				numberEnded=true;
 				powerEnabled=false;
@@ -257,6 +277,7 @@ public class calculator implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				toggledOnce=false;
 				textField.setText(textField.getText()+")");
+				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]=")";
 				numberEnded=true;
 				powerEnabled=false;
@@ -272,6 +293,7 @@ public class calculator implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				toggledOnce=false;
 				textField.setText(textField.getText()+"M");
+				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]="M";
 				numberEnded=true;
 				powerEnabled=false;
@@ -287,6 +309,7 @@ public class calculator implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				toggledOnce=false;
 				textField.setText(textField.getText()+"^");
+				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]="^";
 				numberEnded=true;
 				powerEnabled=false;
@@ -305,6 +328,7 @@ public class calculator implements ActionListener {
 				powerEnabled=false;
 				enabled10E=false;
 				textField.setText("");
+				textField_1.setText("");
 				inText=new String[50];
 				inText[0]="\0";
 				inTop=-1;
@@ -329,6 +353,7 @@ public class calculator implements ActionListener {
 					textField.setText(textField.getText()+"Ans");
 				inText[++inTop]=" "+ans;
 				numberEnded=true;
+				textField_1.setText(textField_1.getText()+" ");
 			//	System.out.printf(" %d: %s ",inTop,inText[inTop]);
 			}
 		});
@@ -455,9 +480,9 @@ public class calculator implements ActionListener {
 		btnNewButton_1.setIcon(null);
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				graphPlotter graphPlot = new graphPlotter();
-				graphPlot.setTitle("Graph Plotter");
-				graphPlot.setVisible(true);
+			//	graphPlotter graphPlot = new graphPlotter();
+			//	graphPlot.setTitle("Graph Plotter");
+				//graphPlot.setVisible(true);
 			}
 		});
 		btnNewButton_1.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -495,9 +520,15 @@ public class calculator implements ActionListener {
 		if(e.getSource()==btn[i])
 			{
 			if(!powerEnabled)
-			textField.setText(textField.getText()+i);
+			{
+				textField.setText(textField.getText()+i);
+				textField_1.setText(textField_1.getText()+" ");
+			}
 			else
-			textField.setText(textField.getText()+ "^"+i);
+			{
+				textField.setText(textField.getText()+" ");
+				textField_1.setText(textField_1.getText()+i);
+			}
 				if(pointTriggred)
 					inText[inTop]=inText[inTop]+i;
 				else
