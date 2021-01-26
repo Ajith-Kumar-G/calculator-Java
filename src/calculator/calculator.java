@@ -152,10 +152,10 @@ public class calculator implements ActionListener {
 		btnNewButton_12.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				textField.setText(textField.getText()+"x10");
-				textField_1.setText(textField_1.getText()+" ");
+				textField_1.setText(textField_1.getText()+"   ");
+				inText[++inTop]="E";
 				powerEnabled=true;
 				enabled10E=true;
-				operatorEnabled=true ;
 				numberEnded=true;
 			}
 		});
@@ -224,8 +224,9 @@ public class calculator implements ActionListener {
 					operatorEnabled=true;
 				toggledOnce=false;
 				textField.setText(textField.getText()+"+");
-				textField_1.setText(textField_1.getText()+"   ");
-				inText[++inTop]="+";
+				for(int sI=inTop;sI<textField.getText().length();sI++)
+				textField_1.setText(textField_1.getText()+" ");
+				inText[++inTop]="+"; 
 				numberEnded=true;
 				powerEnabled=false;
 				
@@ -243,8 +244,16 @@ public class calculator implements ActionListener {
 				if(inTop!=-1 && (inText[inTop].equals("(") || enabled10E ))
 					operatorEnabled=true;
 				toggledOnce=false;
-				textField.setText(textField.getText()+"-");
-				textField_1.setText(textField_1.getText()+" ");
+				if(enabled10E)
+				{
+					textField.setText(textField.getText()+"");
+					textField_1.setText(textField_1.getText()+"- ");
+				}
+				else
+				{
+					textField.setText(textField.getText()+"-");
+					textField_1.setText(textField_1.getText()+" ");
+				}
 				inText[++inTop]="-";
 				numberEnded=true;
 				powerEnabled=false;
@@ -312,7 +321,7 @@ public class calculator implements ActionListener {
 				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]="^";
 				numberEnded=true;
-				powerEnabled=false;
+				powerEnabled=true;
 			}
 		});
 		operationBtn_7.setMargin(new Insets(2, 4, 2, 4));
@@ -519,15 +528,15 @@ public class calculator implements ActionListener {
 		{	
 		if(e.getSource()==btn[i])
 			{
-			if(!powerEnabled)
-			{
-				textField.setText(textField.getText()+i);
-				textField_1.setText(textField_1.getText()+" ");
-			}
-			else
+			if(powerEnabled || enabled10E)
 			{
 				textField.setText(textField.getText()+" ");
 				textField_1.setText(textField_1.getText()+i);
+			}
+			else
+			{	
+				textField.setText(textField.getText()+i);
+				textField_1.setText(textField_1.getText()+" ");
 			}
 				if(pointTriggred)
 					inText[inTop]=inText[inTop]+i;
@@ -537,31 +546,20 @@ public class calculator implements ActionListener {
 						 inText[inTop]=inText[inTop]+i;
 					 else
 					 {
-						 if(enabled10E)
-						 {	
-							 if(operatorEnabled && inTop>0)
-								 inText[inTop-1]=" "+(Double.parseDouble(inText[(inTop--)-1])*Math.pow(10, -i)); 
-							 else
-								 inText[inTop]=" "+(Double.parseDouble(inText[inTop])*Math.pow(10, i));
-						 }
+						 if(operatorEnabled && inTop!=-1)
+							 inText[inTop]=inText[inTop]+i;
 						 else
-						 {
-							 if(operatorEnabled && inTop!=-1)
-								 inText[inTop]=inText[inTop]+i;
-							 else
-								 inText[++inTop]=""+i;
-						 }
+							 inText[++inTop]=""+i;
 					 }
 				
 				}
 				numberEnded=false;
 				operatorEnabled=false;
-				enabled10E=false;
 				pointTriggred=false;
 			}
 		}
 		//System.out.printf(" %d: %s ",inTop,inText[inTop]);
-		//System.out.printf(" state of 10POW %b ",enabled10E);
+		//System.out.printf(" state of 10POW: %b and power: %b ",enabled10E,powerEnabled);
 	}
 	public String[] toPrefix()
 	{
@@ -584,6 +582,7 @@ public class calculator implements ActionListener {
 				case "/":
 				case "x":
 				case "M":
+				case "E":
 				case "^": 		if(top!=-1)
 								while(priority(stack[top])>=priority(inText[i]))
 							{
@@ -616,7 +615,8 @@ public class calculator implements ActionListener {
 	    case "M": return 1;
 	    case "x":
 	    case "/": return 2;
-	    case "^": return 3;
+	    case "^":
+	    case "E":return 3;
 	    default:  return 0;
 	    }
 	}
@@ -624,7 +624,7 @@ public class calculator implements ActionListener {
 	{
 		int operators=0,operand=0,brackets=0;
 		//for(int l=0;inText2[l]!="\0";l++)
-		//	System.out.printf("  %s",inText2[l]);
+			//System.out.printf("  %s",inText2[l]);
 	    for(int i=0;inText2[i]!="\0";i++)
 	    {
 	       switch(inText2[i])
@@ -644,6 +644,8 @@ public class calculator implements ActionListener {
 
 	            case "/": 
 	            	
+	            case "E": 
+	            	
 	            case "M":
 	            
 	            			operators++;
@@ -659,8 +661,8 @@ public class calculator implements ActionListener {
 	}
 	public boolean checkIFOperand(String strings)
 	{
-		String[] opeString= {"+","-","/","x","M","^"};
-			for(int j=0;j<6;j++)
+		String[] opeString= {"+","-","/","x","M","^","E"};
+			for(int j=0;j<7;j++)
 				if(strings.equals(opeString[j]))
 					return false;
 		return true;
@@ -710,6 +712,11 @@ public class calculator implements ActionListener {
 		            case "^":
 		            {
 		                n3 = Math.pow(n1,n2);
+		                break;
+		            }
+		            case "E":
+		            {
+		                n3 = n1*Math.pow(10,n2);
 		                break;
 		            }
 		            }
