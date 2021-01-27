@@ -29,8 +29,11 @@ public class calculator implements ActionListener {
 	String inText[]=new String[50];
 	int inTop=-1;
 	JButton btn[]=new JButton[10];
-	boolean toggledOnce=true,pointTriggred=false,numberEnded=true,operatorEnabled=true,shiftEnabled=false,enabled10E=false,powerEnabled=false;
+	boolean toggledOnce=true,pointTriggred=false,numberEnded=true,operatorEnabled=true,shiftEnabled=false,enabled10E=false,powerEnabled=false,status=false;
 	private JTextField textField_1;
+	private JButton operationBtn_8_1;
+	private JPanel bottomPanel;
+	private JPanel panel_2;
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -64,6 +67,17 @@ public class calculator implements ActionListener {
 		frmComcalculator.getContentPane().add(panel);
 		panel.setLayout(null);
 		
+		textField = new JTextField();
+		textField.setBorder(UIManager.getBorder("ToolTip.border"));
+		textField.setEditable(false);
+		textField.setFont(new Font("Digital-7", Font.PLAIN, 27));
+		textField.setHorizontalAlignment(SwingConstants.TRAILING);
+		textField.setBackground(SystemColor.text);
+		textField.setDisabledTextColor(SystemColor.text);
+		textField.setBounds(10, 12, 202, 44);
+		panel.add(textField);
+		textField.setColumns(10);
+		
 		textField_1 = new JTextField();
 		textField_1.setMargin(new Insets(0, 0, 0, 0));
 		textField_1.setBorder(null);
@@ -75,25 +89,36 @@ public class calculator implements ActionListener {
 		textField_1.setEditable(false);
 		textField_1.setColumns(10);
 		
-		textField = new JTextField();
-		textField.setBorder(UIManager.getBorder("ToolTip.border"));
-		textField.setEditable(false);
-		textField.setFont(new Font("Digital-7", Font.PLAIN, 28));
-		textField.setHorizontalAlignment(SwingConstants.TRAILING);
-		textField.setBackground(SystemColor.text);
-		textField.setDisabledTextColor(SystemColor.text);
-		textField.setBounds(10, 12, 202, 44);
-		panel.add(textField);
-		textField.setColumns(10);
-		
-		JToggleButton statusButton = new JToggleButton("OFF");
+		JToggleButton statusButton = new JToggleButton("<html>OFF</html>");
+		statusButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				bottomPanel.setEnabled(status);
+				textField.setEnabled(status);
+				textField_1.setEnabled(status);
+				status=!status;
+				if(status)
+				{
+					statusButton.setText("<html>ON</html>");
+					frmComcalculator.getContentPane().remove(bottomPanel);
+					frmComcalculator.getContentPane().add(panel_2);
+				}
+				else
+				{
+					statusButton.setText("<html>OFF</html>");
+					frmComcalculator.getContentPane().add(bottomPanel);
+
+				}
+				operationBtn_8_1.doClick();
+				textField.setText("Calculator is OFF!");
+			}
+		});
 		statusButton.setBackground(new Color(0, 153, 0));
 		statusButton.setMargin(new Insets(2, 5, 2, 5));
 		statusButton.setFont(new Font("Tempus Sans ITC", Font.PLAIN, 8));
 		statusButton.setBounds(222, 35, 36, 20);
 		panel.add(statusButton);
 		
-		JButton operationBtn_8_1 = new JButton("AC");
+		operationBtn_8_1 = new JButton("AC");
 		operationBtn_8_1.setBackground(new Color(0, 153, 0));
 		operationBtn_8_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -115,7 +140,7 @@ public class calculator implements ActionListener {
 		operationBtn_8_1.setBounds(222, 10, 36, 22);
 		panel.add(operationBtn_8_1);
 		
-		JPanel bottomPanel = new JPanel();
+		bottomPanel = new JPanel();
 		bottomPanel.setBackground(new Color(37, 230, 204));
 		bottomPanel.setBounds(20, 98, 241, 300);
 		frmComcalculator.getContentPane().add(bottomPanel);
@@ -152,7 +177,9 @@ public class calculator implements ActionListener {
 		btnNewButton_12.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				textField.setText(textField.getText()+"x10");
-				textField_1.setText(textField_1.getText()+"   ");
+				for(int sI=inTop;sI<textField.getText().length()+5;sI++)
+					textField_1.setText(textField_1.getText()+" ");
+			
 				inText[++inTop]="E";
 				powerEnabled=true;
 				enabled10E=true;
@@ -193,7 +220,8 @@ public class calculator implements ActionListener {
 				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]="x";
 				numberEnded=true;
-				powerEnabled=false;
+				 enabled10E=false;
+				 powerEnabled=false;
 			}
 		});
 		normalOperation.add(operationBtn_0);
@@ -209,7 +237,8 @@ public class calculator implements ActionListener {
 				textField_1.setText(textField_1.getText()+" ");
 				inText[++inTop]="/";
 				numberEnded=true;
-				powerEnabled=false;
+				 enabled10E=false;
+				 powerEnabled=false;
 			}
 		});
 		operationBtn_1.setMargin(new Insets(2, 4, 2, 4));
@@ -229,6 +258,7 @@ public class calculator implements ActionListener {
 				inText[++inTop]="+"; 
 				numberEnded=true;
 				powerEnabled=false;
+				 enabled10E=false;
 				
 					//System.out.printf("%d: %s",inTop,inText[inTop]);
 			}
@@ -244,10 +274,10 @@ public class calculator implements ActionListener {
 				if(inTop!=-1 && (inText[inTop].equals("(") || enabled10E ))
 					operatorEnabled=true;
 				toggledOnce=false;
-				if(enabled10E)
+				if(enabled10E )
 				{
 					textField.setText(textField.getText()+"");
-					textField_1.setText(textField_1.getText()+"- ");
+					textField_1.setText(textField_1.getText()+"-");
 				}
 				else
 				{
@@ -257,6 +287,7 @@ public class calculator implements ActionListener {
 				inText[++inTop]="-";
 				numberEnded=true;
 				powerEnabled=false;
+				enabled10E=false;
 				
 			}
 		});
@@ -274,6 +305,7 @@ public class calculator implements ActionListener {
 				inText[++inTop]="(";
 				numberEnded=true;
 				powerEnabled=false;
+				 enabled10E=false;
 			}
 		});
 		operationBtn_4.setMargin(new Insets(2, 2, 2, 2));
@@ -290,6 +322,7 @@ public class calculator implements ActionListener {
 				inText[++inTop]=")";
 				numberEnded=true;
 				powerEnabled=false;
+				enabled10E=false;
 			}
 		});
 		operationBtn_5.setMargin(new Insets(2, 4, 2, 4));
@@ -306,6 +339,7 @@ public class calculator implements ActionListener {
 				inText[++inTop]="M";
 				numberEnded=true;
 				powerEnabled=false;
+				enabled10E=false;
 			}
 		});
 		operationBtn_6.setMargin(new Insets(2, 2, 2, 2));
@@ -515,7 +549,7 @@ public class calculator implements ActionListener {
 		operationBtn_8_1_1.setBounds(10, 5, 47, 22);
 		frmComcalculator.getContentPane().add(operationBtn_8_1_1);
 		
-		JPanel panel_2 = new JPanel();
+		panel_2 = new JPanel();
 		panel_2.setBackground(new Color(153, 255, 102));
 		panel_2.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
 		panel_2.setBounds(10, 94, 266, 309);
@@ -528,7 +562,7 @@ public class calculator implements ActionListener {
 		{	
 		if(e.getSource()==btn[i])
 			{
-			if(powerEnabled || enabled10E)
+			if(powerEnabled || enabled10E || (operatorEnabled && textField_1.getText().endsWith("-")))
 			{
 				textField.setText(textField.getText()+" ");
 				textField_1.setText(textField_1.getText()+i);
@@ -536,7 +570,8 @@ public class calculator implements ActionListener {
 			else
 			{	
 				textField.setText(textField.getText()+i);
-				textField_1.setText(textField_1.getText()+" ");
+				for(int sI=inTop;sI<textField.getText().length();sI++)
+					textField_1.setText(textField_1.getText()+" ");
 			}
 				if(pointTriggred)
 					inText[inTop]=inText[inTop]+i;
@@ -556,6 +591,7 @@ public class calculator implements ActionListener {
 				numberEnded=false;
 				operatorEnabled=false;
 				pointTriggred=false;
+				enabled10E=false;
 			}
 		}
 		//System.out.printf(" %d: %s ",inTop,inText[inTop]);
