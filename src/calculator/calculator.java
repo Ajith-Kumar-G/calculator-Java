@@ -68,6 +68,7 @@ public class calculator implements ActionListener {
 		panel.setLayout(null);
 		
 		textField = new JTextField();
+		textField.setMargin(new Insets(2, 4, 2, 2));
 		textField.setBorder(UIManager.getBorder("ToolTip.border"));
 		textField.setEditable(false);
 		textField.setFont(new Font("Digital-7", Font.PLAIN, 27));
@@ -77,17 +78,6 @@ public class calculator implements ActionListener {
 		textField.setBounds(10, 12, 202, 44);
 		panel.add(textField);
 		textField.setColumns(10);
-		
-		textField_1 = new JTextField();
-		textField_1.setMargin(new Insets(0, 0, 0, 0));
-		textField_1.setBorder(null);
-		textField_1.setBounds(12, 15, 196, 10);
-		panel.add(textField_1);
-		textField_1.setHorizontalAlignment(SwingConstants.TRAILING);
-		textField_1.setBackground(SystemColor.text);
-		textField_1.setFont(new Font("Digital-7", Font.PLAIN, 11));
-		textField_1.setEditable(false);
-		textField_1.setColumns(10);
 		
 		JToggleButton statusButton = new JToggleButton("<html>OFF</html>");
 		statusButton.addActionListener(new ActionListener() {
@@ -109,9 +99,19 @@ public class calculator implements ActionListener {
 
 				}
 				operationBtn_8_1.doClick();
-				textField.setText("Calculator is OFF!");
 			}
 		});
+		
+		textField_1 = new JTextField();
+		textField_1.setMargin(new Insets(0, 0, 0, 0));
+		textField_1.setBorder(null);
+		textField_1.setBounds(12, 15, 196, 10);
+		panel.add(textField_1);
+		textField_1.setHorizontalAlignment(SwingConstants.TRAILING);
+		textField_1.setBackground(SystemColor.text);
+		textField_1.setFont(new Font("Digital-7", Font.PLAIN, 11));
+		textField_1.setEditable(false);
+		textField_1.setColumns(10);
 		statusButton.setBackground(new Color(0, 153, 0));
 		statusButton.setMargin(new Insets(2, 5, 2, 5));
 		statusButton.setFont(new Font("Tempus Sans ITC", Font.PLAIN, 8));
@@ -520,6 +520,7 @@ public class calculator implements ActionListener {
 		panel_1.add(inBuiltOperation_11);
 		
 		JButton btnNewButton_1 = new JButton("~Graph");
+		btnNewButton_1.setEnabled(false);
 		btnNewButton_1.setIcon(null);
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -537,6 +538,7 @@ public class calculator implements ActionListener {
 		btnNewButton_1.setFont(new Font("Trebuchet MS", Font.PLAIN, 13));
 		
 		JButton operationBtn_8_1_1 = new JButton("SHIFT");
+		operationBtn_8_1_1.setEnabled(false);
 		operationBtn_8_1_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				shiftEnabled=!shiftEnabled;
