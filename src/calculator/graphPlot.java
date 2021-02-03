@@ -1,25 +1,24 @@
 package calculator;
 
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Graphics;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.SystemColor;
 import javax.swing.JLabel;
 
-public class graphPlot {
+public class graphPlot extends JFrame {
 
-	private JFrame frame;
+	private JFrame frmGraphplotter;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					graphPlot window = new graphPlot();
-					window.frame.setVisible(true);
+					window.frmGraphplotter.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -27,29 +26,35 @@ public class graphPlot {
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
 	public graphPlot() {
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 740, 460);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(null);
+		frmGraphplotter = new JFrame();
+		frmGraphplotter.setTitle("GraphPlotter");
+		frmGraphplotter.setBounds(100, 100, 740, 460);
+		frmGraphplotter.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmGraphplotter.getContentPane().setLayout(null);
 		
 		JPanel panel = new JPanel();
 		panel.setBackground(SystemColor.text);
 		panel.setBounds(57, 24, 576, 259);
-		frame.getContentPane().add(panel);
+		frmGraphplotter.getContentPane().add(panel);
+		panel.setLayout(null);
+		
+		int root[][]={{57,24},{633,24},{633,283},{57,283}};
+		int midY=153,midX=345;
 		
 		JLabel lblNewLabel = new JLabel("Equation: ");
 		lblNewLabel.setBounds(60, 315, 65, 22);
-		frame.getContentPane().add(lblNewLabel);
+		frmGraphplotter.getContentPane().add(lblNewLabel);
+		repaint();
 	}
+		public void paint(Graphics g)
+		{
+			Graphics scale=g.create(57,24,576,259);
+			scale.setColor(Color.RED);
+			scale.drawLine(57, 153, 633, 153);
+		}
 }
